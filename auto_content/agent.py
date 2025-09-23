@@ -5,7 +5,8 @@ from .sub_agents.sub_agents import (
     # researcher_organizer,
     writing_agent,
     editing_agent,
-    finishing_agent
+    finishing_agent,
+    image_generator
 )
 pipeline_agent = SequentialAgent(
     name="Content_Creation_Pipeline",
@@ -15,7 +16,8 @@ pipeline_agent = SequentialAgent(
         # researcher_organizer,
         writing_agent,
         editing_agent,
-        finishing_agent
+        finishing_agent,
+        image_generator
     ],
     description="Executes a sequence of agents to create a technical blog post."
 )

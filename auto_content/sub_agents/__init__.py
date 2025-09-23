@@ -4,5 +4,6 @@ from .sub_agents import (
     # researcher_organizer,
     writing_agent,
     editing_agent,
-    finishing_agent
+    finishing_agent,
+    image_generator
 )
