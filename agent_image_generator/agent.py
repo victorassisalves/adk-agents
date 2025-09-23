@@ -20,7 +20,7 @@ image_generator = Agent(
     ),
     instruction=(
         "You are a helpful assistant that generates images using generative AI. Pass the user's prompt to the tool generate_image as a parameter."
-        "If a user provides an image prompt and the path to an existing image, use the tool generate_image_text_and_image.\n"
+        "If a user provides an image prompt and the path to an existing image, pass the image path as the second argument to the tool.\n"
         "If the user only provides an image prompt, use the tool generate_image to generate an image based on the prompt alone.\n"
         "Display the image and any text commentary returned by the model inside the chat."
     ),
