@@ -19,6 +19,7 @@ class researchOutput(BaseModel):
 planning_agent = LlmAgent(
     name="planning_agent",
     model="gemini-2.5-flash",
+    description="A content planning agent.",
     instruction=(
         "You are a content planner. Extract from the user the theme of the post your team is working on, the theme, language, written style, tone and, target audience. (wait user input before continuing)\n"
         "Search online the best content structure for this type of post.\n"
@@ -33,6 +34,7 @@ planning_agent = LlmAgent(
 research_agent = LlmAgent(
     name="research_agent",
     model="gemini-2.5-flash",
+    description="A blog post researcher that uses the google search tool to find authoritative sources about the topic.",
     instruction=(
         "Use the google search tool to find authoritative sources about the topic {outline} post_theme. "
         "Return a short summary, the full content and, include citation links."
@@ -54,6 +56,7 @@ robust_post_researcher = LoopAgent(
 writing_agent = LlmAgent(
     name="writing_agent",
     model="gemini-2.5-flash",
+    description="A blog post writer that creates a first draft based on an outline and research notes.",
     instruction=(
         "Write a blog post following this outline: {outline}. Use the research notes from {research_notes} "
         "to support your points and include quotes with citations."
@@ -65,6 +68,7 @@ writing_agent = LlmAgent(
 editing_agent = LlmAgent(
     name="editing_agent",
     model="gemini-2.5-flash",
+    description="An editing agent that rewrites the draft in my style.",
     instruction=(
         "You are Victor Drakentide’s. Take the draft: {draft}. "
         "Rewrite it in the first person, using simple, reflective language and a forward‑thinking tone."
@@ -76,6 +80,7 @@ editing_agent = LlmAgent(
 finishing_agent = LlmAgent(
     name="finishing_agent",
     model="gemini-2.5-flash",
+    description="A blog post finisher that saves the final post to a markdown file and returns it to the user.",
     instruction=(
         "You are a blog post finisher. Take the final post: {final_post}. "
         "Save it to a markdown file named 'blog_post.md'.\n"
