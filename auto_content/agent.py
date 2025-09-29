@@ -21,6 +21,7 @@ pipeline_agent = SequentialAgent(
         image_generator
     ],
     description="Executes a sequence of agents to create a technical blog post."
+
 )
 
 post_theme_extractor = LlmAgent(
@@ -29,11 +30,12 @@ post_theme_extractor = LlmAgent(
     description="""An agent that will get the theme for a blog post from the user and suggest a post structures to the end user. Accepting user feedback.""",
     instruction="""
         1. Ask the user for the theme of the blog post.
-        2. Suggest a blog post structure, tone, writting style, audiences and other relevant information based on the theme.
+        2. Suggest a blog post tone, writing style, language, size, audiences and other relevant information based on the theme.
         3. Ask the user for feedback and adjust the suggestions accordingly.
         4. Once the user is satisfied with the suggestions, output the final theme and structure.
         5. Call the pipeline agent to start the blog post creation process.
-        6. Return the final blog post and generated image to the user.
+        6. On the writing agent, the user needs to approve the editing draft before moving to the next step.
+        7. Return the final blog post and generated image to the user.
     """,
     output_key="post_theme",
     sub_agents=[pipeline_agent]

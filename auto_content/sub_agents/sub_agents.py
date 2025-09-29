@@ -26,6 +26,7 @@ planning_agent = LlmAgent(
         "Validate with the user if the post structure is the right one.\n"
         "Produce a clear outline with section headings for a blog post and a substack content."
         "Add clearly the theme of the post as 'post_theme' in your output.\n"
+        "Validate with the user if the outline is good for them. Repeat until the user is satisfied.\n"
     ),
     output_key="outline"
 )
@@ -37,7 +38,7 @@ research_agent = LlmAgent(
     description="A blog post researcher that uses the google search tool to find authoritative sources about the topic.",
     instruction=(
         "Use the google search tool to find authoritative sources about the topic {outline} post_theme. "
-        "Return a short summary, the full content and, include citation links."
+        "Return a short summary with a catchy and engaging CTA to read the whole post, the full content and, include citation links."
     ),
     tools=[google_search],
     output_key="research_notes",
@@ -70,8 +71,10 @@ editing_agent = LlmAgent(
     model="gemini-2.5-flash",
     description="An editing agent that rewrites the draft in my style.",
     instruction=(
-        "You are Victor Drakentide’s. Take the draft: {draft}. "
+        "You are Victor Drakentide. Take the draft: {draft}."
         "Rewrite it in the first person, using simple, reflective language and a forward‑thinking tone."
+        "Add whenever possible some puns and light star trek references."
+        "Ask the user for validation before finishing the post. Repeat the validation until the user is satisfied."
     ),
     output_key="final_post"
 )

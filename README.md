@@ -19,7 +19,7 @@ env.example       # Copy to .env and fill in credentials
 ## Setup
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install --upgrade pip
 pip install google-adk
@@ -45,7 +45,7 @@ set -a; source .env; set +a                       # alternative shell-safe form
 You can exercise the agent locally with a quick Python snippet:
 
 ```bash
-adk run
+adk web
 ```
 
 To deploy with the ADK CLI:
