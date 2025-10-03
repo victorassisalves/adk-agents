@@ -1,26 +1,43 @@
 import datetime
+from dotenv import load_dotenv
 from google.adk.agents import Agent, LlmAgent
 from google.adk.tools import google_search
+from google.adk.models.lite_llm import LiteLlm
 import os
 import google.auth
-
+load_dotenv()
 _, project_id = google.auth.default()
-os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "True")
+# os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "True")
 os.environ.setdefault("GOOGLE_CLOUD_PROJECT", project_id)
 os.environ.setdefault("GOOGLE_CLOUD_REGION", "us-central1")
 
-audio_model_native_audio = "gemini-live-2.5-flash-preview-native-audio"
-audio_model = "gemini-live-2.5-flash-preview"
-text_model_lite = "gemini-2.5-flash-lite"
-text_model = "gemini-2.5-flash"
-image_model = "gemini-2.5-flash-image-preview"
+audio_model_native_audio = LiteLlm(
+    model="gemini-live-2.5-flash-preview-native-audio",
+    api_key=os.getenv("GOOGLE_API_KEY")
+)
+audio_model = LiteLlm(
+    model="gemini-live-2.5-flash-preview",
+    api_key=os.getenv("GOOGLE_API_KEY")
+)
+text_model_lite = LiteLlm(
+    model="gemini-2.5-flash-lite",
+    api_key=os.getenv("GOOGLE_API_KEY")
+)
+text_model = LiteLlm(
+    model="gemini-2.5-flash",
+    api_key=os.getenv("GOOGLE_API_KEY")
+)
+image_model = LiteLlm(
+    model="gemini-2.5-flash-image-preview",
+    api_key=os.getenv("GOOGLE_API_KEY")
+)
 now = datetime.datetime.now()
 
 podcast_theme_researcher = LlmAgent(
     name="Podcast_Theme_Researcher_Agent",
     model=text_model,
     description=(
-        "You are an expert in researching podcast themes and topics using online search tools."
+        "You are an expert in researching a theme for a deep dive and topics using online search tools."
     ),
     instruction=f"You are a helpful assistant that researches deep and relevant information about a theme using the most updated content as of today {now}. Use the google_search tool to gather information about the podcast theme provided by the user. Summarize your findings and provide a list of references.\n",
     tools=[google_search],
@@ -40,14 +57,14 @@ podcast_script_creator = Agent(
 )
 
 root_agent = Agent(
-    name="Podcast_Creation_Agent",
+    name="podcast_ai",
     model=text_model,
     description=(
         "You are an expert in creating podcasts from theme research to script writing."
     ),
     instruction=(
-        "You are a helpful assistant that creates podcasts from theme research to script writing. First, use the Podcast_Theme_Researcher_Agent to research the podcast theme provided by the user. Then, use the Podcast_Script_Creator_Agent to create a compelling podcast script based on the research findings. Ensure the final podcast script is well-structured, informative, and engaging for listeners.\n"
+        "You are a helpful assistant that creates podcasts from theme research to script writing. First, use the Podcast_Theme_Researcher_Agent to research the podcast theme provided by the user. Then, create a compelling podcast script based on the research findings. Ensure the final podcast script is well-structured, informative, and engaging for listeners.\n"
     ),
-    sub_agents=[podcast_theme_researcher, podcast_script_creator],
+    sub_agents=[podcast_theme_researcher],
     output_key="podcast",
 )
