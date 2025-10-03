@@ -2,7 +2,8 @@ import os
 
 def save_prd_file(file_name: str, content: str)-> dict:
     """
-        This tool is responsible for saving a file inside the project. 
+        This tool is responsible for saving a file inside the project.
+        Parameters (file_name: str, conten: str)
         And it returns the file location and status success upon success.
         Upon error, returns status failed and the error
     """

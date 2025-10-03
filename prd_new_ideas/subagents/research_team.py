@@ -1,6 +1,9 @@
 from google.adk.agents import Agent, ParallelAgent, SequentialAgent
 from google.adk.tools import google_search
 from ..config import (text_model,text_model_lite)
+from ..tools.tools import (
+    save_prd_file
+)
 import datetime
 
 now = datetime.datetime.now()
@@ -84,7 +87,8 @@ synthesizer = Agent(
     name="Synthesizer",
     model=text_model,
     description="Expert im building combined reports from researches",
-    instruction="Combine results from {persona_research}, {tech_research} and {market_research}.",
+    instruction="Combine results from {persona_research}, {tech_research} and {market_research}. and save research into an markdown file using save file tool. The tool need two paramenters (file_name, content) for file name use Product Requirement Document (PRD) name. Instead of spaces, use _ between words.",
+    tools=[save_prd_file],
     output_key="combined_reasearch"
 )
 
