@@ -87,7 +87,7 @@ synthesizer = Agent(
     name="Synthesizer",
     model=text_model,
     description="Expert im building combined reports from researches",
-    instruction="Combine results from {persona_research}, {tech_research} and {market_research}. and save research into an markdown file using save file tool. The tool need two paramenters (file_name, content) for file name use Product Requirement Document (PRD) name. Instead of spaces, use _ between words.",
+    instruction="Combine results from {persona_research}, {tech_research} and {market_research}. and save research into an markdown file using save file tool. The tool need two paramenters (file_name, content) for file name use PRD_research_ name_of_the_PRD (the actual name not the literal text). Instead of spaces, use _ between words.",
     tools=[save_prd_file],
     output_key="combined_reasearch"
 )
