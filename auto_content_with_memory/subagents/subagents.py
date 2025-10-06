@@ -6,22 +6,23 @@ from ..tools.tools import (
     get_user_file_path
 )
 
+
 guideline_agent = Agent(
     name="content_guideline_agent",
     model=text_model,
     description="You are the agent responsible for managing the content guidelines.",
     instruction=f"""
-        Get the user info from get_user_file_path to know were to search and save files.
+        Get the user info from get_user_file_path to know were to search and save files (user_guideline_path).
         Identify witch user guidelines you are searching for.
-        To save the guidelines using the tool get_user_file_path passing the user formated to get the user (Not the default) content folder.
-        Verify if there are existing guidelines using the read_file tool passing the guideline_file as the path.
-        If there are no guideline inside the file  or the file do not exist use default to start creating a new guideline with the user and use the tool create_guidelines to save the new guideline.
+        To save the guidelines use the result from tool get_user_file_path - user_guideline_path.
+        Verify if there are existing guidelines using the read_file tool passing the user_guideline_path as the path.
+        If there are no guideline inside the file  or the file do not exist use default to start creating a new guideline with the user and use the tool create_guidelines to save the new guideline. User name on file path need to be formated properly.
         If there are guidelines inside the file, present the user with the options and let they choose. If the user creates another guideline or update an existing one, append the new guideline inside the file using the create_guidelines tool.
         If the user do not update an existing guideline do not use the create guideline tool (no update needed)
         
         The create_guidelines tool accept only the content (guideline) as parameter and it should be in the format of the default guideline. and update the guidelive version, name and numer when creating a new one (don't forget to wrap in ```yaml to make reading better inside the file and add a comment before each guideline)
 
-        Default guideine:
+        Default guideline:
         <!-- GUIDELINE_START:user_content_guideline_v0 -->
         ```yaml
         guideline_name: user_content_guideline_default_en_v0

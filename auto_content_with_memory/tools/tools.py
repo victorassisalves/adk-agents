@@ -1,28 +1,25 @@
 import os
 current_dir = os.path.dirname(__file__)
-def create_guidelines(content: str, file_path: str)-> dict:
+def create_guidelines(content: str, file_path: str) -> dict:
     """
-        This tool is responsible for saving a file inside the project.
-        Parameters (file_name: str, conten: str)
-        And it returns the file location and status success upon success.
-        Upon error, returns status failed and the error
+        Persist guideline content to the provided markdown file path.
+        Parameters (content: str, file_path: str)
+        Returns the file location and status "success" when writing succeeds.
+        Upon error, returns status "failed" and the error message.
     """
     try:
+        # Ensure we can create the parent folder before writing.
+        resolved_path = os.path.abspath(file_path)
+        parent_dir = os.path.dirname(resolved_path)
+        if parent_dir:
+            os.makedirs(parent_dir, exist_ok=True)
 
-        # Go up one level and into prds/
-        guideline_dir = os.path.join(file_path, "..", "guidelines")
-
-        # Make sure prds folder exists
-        os.makedirs(guideline_dir, exist_ok=True)
-
-        # Build full path: ../prds/example.md
-        file_path = os.path.join(guideline_dir, "guidelines.md")
-        mode = "a" if os.path.exists(file_path) else "w"
-        with open(file_path, mode, encoding="utf-8") as f:
+        mode = "a" if os.path.exists(resolved_path) else "w"
+        with open(resolved_path, mode, encoding="utf-8") as f:
             f.write(("\n" if mode == "a" else "") + content)
 
         return {
-            "file_location": file_path,
+            "file_location": resolved_path,
             "status": "success"
         }
     except FileNotFoundError:
@@ -85,11 +82,14 @@ def get_user_file_path(user: str)-> dict:
         Upon failure:
         returns {status: failed, error: str}
     """
+    user_folder = user.strip().lower().replace(" ", "_")
     try:
 
-        content_dir = os.path.join(current_dir, "..", f"content/{user}")
-        guideline_dir = os.path.join(current_dir, "..", f"content/{user}/guidelines")
-        guideline_file = os.path.join(current_dir, "..", f"content/{user}/guidelines/guidelines.md")
+        base_dir = os.path.abspath(os.path.join(current_dir, ".."))  # one level up
+
+        content_dir = os.path.join(base_dir, "content", user_folder)
+        guideline_dir = os.path.join(content_dir, "guidelines")
+        guideline_file = os.path.join(guideline_dir, "guidelines.md")
 
         return {
             "user_content_path": content_dir,
@@ -147,7 +147,8 @@ def create_user_list(user_content: str) -> dict:
         Upon failure:
         returns {status: failed, error: str}
     """
-    user_list = os.path.join(current_dir, "..", "content")
+    base_dir = os.path.abspath(os.path.join(current_dir, ".."))
+    user_list = os.path.join(base_dir, "content")
 
     try:
         file_path = os.path.join(user_list, "user_list.md")
