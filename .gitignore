@@ -86,6 +86,9 @@ target/
 
 /posts/*
 
+/content/*
+user_list.md
+
 # Jupyter Notebook
 .ipynb_checkpoints
 
