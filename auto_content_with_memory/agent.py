@@ -3,6 +3,14 @@ from .config import (text_model)
 from .subagents.subagents import (
     guideline_agent
 )
+from .tools.tools import (
+    get_user_list,
+    create_user_list,
+    get_user_file_path
+)
+
+user_id = 'default'
+
 root_agent = Agent(
     model=text_model,
     name="content_creator_orchestrator",
@@ -22,15 +30,29 @@ root_agent = Agent(
         3 - Necessary initial content:
             Content Theme
             Content Goal
-
+            User Name
         Flow:
         A) Clarify Request
         • Identify the audience and main goal.
         • Determine the topic and preferred angle.
-        B) Call the Guideline Agent
+        B) Identify user who is creating the content. Get from the get_user_list tool the user list. Look for close matchups. Maybe the user had a typo.
+        • Create the {user_id} variable value according with the following rules: 
+            Use dashes to fill spaces (Jhon Doe = jhon_doe). To create folder use the ALL lowercase name with dashes.
+            DO NOT Use name as inputed
+        • get list of users based on the content folder.
+        • Create a new user list if user list is empty. Use the create_user_list for this passing the user_content as parameter.
+        • Get user file path AFTER creating a new user filder using get_user_file_path.
+        • User content format (ensure yaml on md) when creating or appending the user list.:
+            ```yaml
+            user_name: user_name,
+            user_id: formatted_user_name
+            user_file_path: user_file_path
+            ```
+        C) Call the Guideline Agent
 
         Ensure the brief contains all requested or default values so that
         downstream agents have no unanswered questions.
     """,
-    sub_agents=[guideline_agent]
+    sub_agents=[guideline_agent],
+    tools=[get_user_list, create_user_list, get_user_file_path]
 )
