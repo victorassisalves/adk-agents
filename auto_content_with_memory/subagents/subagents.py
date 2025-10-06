@@ -5,11 +5,14 @@ from ..tools.tools import (
     read_file,
     get_user_file_path
 )
-
+from google.genai import types
 
 guideline_agent = Agent(
     name="content_guideline_agent",
     model=text_model,
+    generate_content_config=types.GenerateContentConfig(
+        temperature=0.5, # More deterministic output
+    ),
     description="You are the agent responsible for managing the content guidelines.",
     instruction=f"""
         Get the user info from get_user_file_path to know were to search and save files (user_guideline_path).
