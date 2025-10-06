@@ -86,7 +86,6 @@ target/
 
 /posts/*
 
-/content/*
 user_list.md
 
 # Jupyter Notebook
@@ -205,3 +204,4 @@ my_env.tfvars
 .saved_chats
 .env
 .requirements.txt
+auto_content_with_memory/content/*
