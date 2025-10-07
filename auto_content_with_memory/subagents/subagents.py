@@ -64,5 +64,6 @@ guideline_agent = Agent(
     Always use the format of the template avo to save future guidelines.
     Always confirm with the user before saving.
     """,
+    output_key="guideline",
     tools=[read_file, create_guidelines, get_user_file_path]
 )

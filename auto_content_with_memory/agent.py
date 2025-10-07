@@ -3,6 +3,9 @@ from .config import (text_model)
 from .subagents.subagents import (
     guideline_agent
 )
+from .subagents.content_creation_team import (
+    content_creation_team
+)
 from .tools.tools import (
     get_user_list,
     create_user_list,
@@ -40,17 +43,18 @@ root_agent = Agent(
         • Get from the get_user_list tool the user list. Look for close matchups. Maybe the user had a typo.
         • Create a new user list if user list is empty. Use the create_user_list for this passing the user_content as parameter.
         • Get user file path AFTER creating a new user filder using get_user_file_path(user_id).
-        • User content format (ensure yaml on md) when creating or appending the user list.:
+        • User content format (ensure yaml on md) when creating or appending the user list:
             ```yaml
             user_name: user_name,
             user_id: formatted_user_name
             user_file_path: user_file_path
             ```
         C) Call the Guideline Agent
+        D) After Guideline is defined, call the content_creation_team to start the content creation
 
         Ensure the brief contains all requested or default values so that
         downstream agents have no unanswered questions.
     """,
-    sub_agents=[guideline_agent],
+    sub_agents=[guideline_agent, content_creation_team],
     tools=[get_user_list, create_user_list, get_user_file_path]
 )
