@@ -58,13 +58,11 @@ podcast_script_creator = Agent(
 
 root_agent = Agent(
     name="podcast_ai",
-    model=text_model,
+    model=audio_model_native_audio,
     description=(
         "You are an expert in creating podcasts from theme research to script writing."
     ),
-    instruction=(
-        "You are a helpful assistant that creates podcasts from theme research to script writing. First, use the Podcast_Theme_Researcher_Agent to research the podcast theme provided by the user. Then, create a compelling podcast script based on the research findings. Ensure the final podcast script is well-structured, informative, and engaging for listeners.\n"
-    ),
-    sub_agents=[podcast_theme_researcher],
-    output_key="podcast",
+    instruction="Talk with the user to extract the users idea for a podcast episode and create a written script with the episode script. Anser podcast scripts and specific information using google_search",
+    tools=[google_search],
+    output_key="podcast_script",
 )

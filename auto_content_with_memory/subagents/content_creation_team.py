@@ -2,6 +2,7 @@ import datetime
 from google.adk.agents import Agent, SequentialAgent, LoopAgent
 from google.adk.tools import google_search
 from crewai_tools import ScrapeWebsiteTool
+from google.genai import types
 from ..config import (
     text_model,
     text_model_lite
@@ -47,6 +48,7 @@ theme_research_definition = Agent(
 
 content_research_agent = Agent(
     name="content_research_specialst",
+    model=text_model_lite,
     description="Expert in online research. You always find the best and more credible resourses.",
     instruction=f"""
         Getting the most updated information as of today {now}. Search online the topics theme_topics created by the theme_research_definition_agent and get deep valuable and insightful content. According with the theme, do the best research and content gathering. If practical, serach for more practical examples, if insightful, get more insight, more actionable, get more actions and so on. Describe your chain of thought.
@@ -68,21 +70,44 @@ content_structure_agent = Agent(
     output_key="content_structure"
 )
 
-# writing_agent = Agent()
+writing_agent = Agent(
+    name="content_writer_agent",
+    model=text_model,
+    description="You are an exert in creating in depth valueable contents that will be easy to read and generate an insane amount of value to the reader.",
+    instruction=f""""
+        You need to generate content based in the guideline selected, the content_structure, and the full research content_research. Follow the guideline to the letter to make sure the content follow the user need.
+        Create valueable content that's easy to read and scannable.
+    """,
+    generate_content_config=types.GenerateContentConfig(
+        temperature=0.5, # More deterministic output
+    ),
+    output_key="draft"
+)
 
-# review_agent = Agent()
+review_agent = Agent(
+    name="content_review_agent",
+    model=text_model,
+    description="You are an expert content reviewer. Your job is to be critic on the draft provided by the writing_agent.",
+    instruction=f"""
+        Get the draft from the writing_agent and start reviewing.
+        You need to evaluate the content according with the guidelines.
+    """,
+    generate_content_config=types.GenerateContentConfig(
+        temperature=0.5, # More deterministic output
+    ),
+)
 
-# content_writing_team = LoopAgent(
-#     name="content_writing_team",
-#     description="You manage a team that writes content and refine until it's great and publishable",
-#     max_iterations=5,
-#     sub_agents=[writing_agent, review_agent]
-# )
+content_review_team = LoopAgent(
+    name="content_writing_team",
+    description="You manage a team that writes content and refine until it's great and publishable",
+    max_iterations=5,
+    sub_agents=[review_agent]
+)
 
 content_creation_team = SequentialAgent(
     name="content_creation_team",
     description="You are the sequential coordinator of the content creation team.",
-    sub_agents=[theme_research_definition, content_research_agent, content_structure_agent]
+    sub_agents=[theme_research_definition, content_research_agent, content_structure_agent, writing_agent, content_review_team]
 )
 
 # AI Agent for lead generation
