@@ -1,26 +1,13 @@
 import datetime
 from google.adk.agents import Agent, SequentialAgent, LoopAgent
 from google.adk.tools import google_search
-from google.adk.tools.tool_context import ToolContext
+from crewai_tools import ScrapeWebsiteTool
 from google.genai import types
-from ..tools.tools import (
-  generate_image
-)
 from ..config import (
     text_model,
     text_model_lite
 )
-# from crewai_tools import ScrapeWebsiteTool
 now = datetime.datetime.now()
-
-DRAFT = ""
-# --- Tool Definition ---
-def exit_loop(tool_context: ToolContext):
-  """Call this function ONLY when the critique indicates no further changes are needed, signaling the iterative process should end."""
-  print(f"  [Tool Call] exit_loop triggered by {tool_context.agent_name}")
-  tool_context.actions.escalate = True
-  # Return empty dict as tools should typically return JSON-serializable output
-  return {}
 # CONTENT MEMORY
 # V0 - Save content locally
 # V1 - Save content online (RAG) Optimize
@@ -90,89 +77,37 @@ writing_agent = Agent(
     instruction=f""""
         You need to generate content based in the guideline selected, the content_structure, and the full research content_research. Follow the guideline to the letter to make sure the content follow the user need.
         Create valueable content that's easy to read and scannable.
-        When necessary, dive deep into technical aspects. Explain the 'how' and 'why' behind the content.
-        If you think more info is necessary to write, use the google_search tool.
     """,
     generate_content_config=types.GenerateContentConfig(
         temperature=0.5, # More deterministic output
     ),
-    tools=[google_search],
-    output_key=DRAFT
+    output_key="draft"
 )
 
 review_agent = Agent(
     name="content_review_agent",
-    model=text_model_lite,
+    model=text_model,
     description="You are an expert content reviewer. Your job is to be critic on the draft provided by the writing_agent.",
     instruction=f"""
         Get the draft from the writing_agent and start reviewing.
-        You need to evaluate the content according with the guidelines. to make sure the content have high upstanding value.
-        The content fufill it's purpose and will be the best way to deliver the message and achieve the goal.
-        **Task:**
-            Review the ```{DRAFT}``` for clarity, engagement, and basic coherence according to the initial topic (if known).
-
-            IF you identify 1-2 *clear and actionable* ways the document could be improved to better capture the topic or enhance reader engagement (e.g., "Needs a stronger opening sentence", "Clarify the character's goal"):
-            Provide these specific suggestions concisely. Output *only* the critique text.
-
-            ELSE IF the document is coherent, addresses the topic adequately for its length, and has no glaring errors or obvious omissions:
-            Respond *exactly* with the phrase "CONTENT APPROVED" and nothing else. It doesn't need to be perfect, just functionally complete for this stage. Avoid suggesting purely subjective stylistic preferences if the core is sound.
-
-            Do not add explanations. Output only the critique OR the exact completion phrase.
+        You need to evaluate the content according with the guidelines.
     """,
     generate_content_config=types.GenerateContentConfig(
         temperature=0.5, # More deterministic output
     ),
-    output_key="review_suggestions"
 )
 
-edit_review = Agent(
-    name="RefinerAgent",
-    model=text_model,
-    instruction=f"""You are a Creative Writing Assistant refining a document based on feedback OR exiting the process.
-    **Current Document:**
-    draft
-    **Critique/Suggestions:**
-    review_suggestions
-
-    **Task:**
-    Analyze the 'review_suggestions'.
-    IF the critique is *exactly* "CONTENT APPROVED":
-    Just handle to the next agent. Do not output any text.
-    ELSE (the critique contains actionable feedback):
-    Carefully apply the suggestions to improve the DRAFT. Output *only* the refined document text..
-""",
-    description="Refines the document based on critique, or calls exit_loop if critique indicates completion.",
-    output_key=DRAFT # Overwrites state['current_document'] with the refined version
+content_review_team = LoopAgent(
+    name="content_writing_team",
+    description="You manage a team that writes content and refine until it's great and publishable",
+    max_iterations=5,
+    sub_agents=[review_agent]
 )
-
-image_generator = Agent(
-    name="Master_Image_Generator_Agent",
-    model=text_model_lite,
-    description=(
-        "You are an expert in generating images using generative AI.\n"
-        "You use the theme and content goals to help you create detailed prompts for generating images."
-    ),
-    instruction=(
-        "You are a helpful assistant that generates images using generative AI.\n"
-        "Create a detailed prompt for generating an image that complements the blog post theme and goals and matches the post style.\n"
-        "Use the tool 'generate_image' to generate the image.\n"
-        "Unless requested otherwise, generate 3 images matching the theme so the user can choose. Opt for images without text."
-    ),
-    tools=[generate_image],
-)
-
-media_team = LoopAgent(
-    name="media_team",
-    description="You manage a team that generates images for the post",
-    max_iterations=3,
-    sub_agents=[image_generator]
-)
-
 
 content_creation_team = SequentialAgent(
     name="content_creation_team",
     description="You are the sequential coordinator of the content creation team.",
-    sub_agents=[theme_research_definition, content_research_agent, content_structure_agent, writing_agent, review_agent, edit_review, media_team]
+    sub_agents=[theme_research_definition, content_research_agent, content_structure_agent, writing_agent, content_review_team]
 )
 
 # AI Agent for lead generation

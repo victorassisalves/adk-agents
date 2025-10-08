@@ -1,4 +1,3 @@
-import datetime
 from google.adk.agents import Agent
 from .config import (text_model)
 from .subagents.subagents import (
@@ -10,10 +9,8 @@ from .subagents.content_creation_team import (
 from .tools.tools import (
     get_user_list,
     create_user_list,
-    get_user_file_path,
-    create_file
+    get_user_file_path
 )
-now = datetime.datetime.now()
 
 root_agent = Agent(
     model=text_model,
@@ -54,11 +51,10 @@ root_agent = Agent(
             ```
         C) Call the Guideline Agent
         D) After Guideline is defined, call the content_creation_team to start the content creation
-        E) Once everything is ready, save the content and images inside the proper content folder (user_content_path/{now}) inside the current user using the create_file tool passing the content (post then images) to the content folder.
-        
+
         Ensure the brief contains all requested or default values so that
         downstream agents have no unanswered questions.
     """,
-    sub_agents=[guideline_agent, content_creation_team, ],
-    tools=[get_user_list, create_user_list, get_user_file_path, create_file]
+    sub_agents=[guideline_agent, content_creation_team],
+    tools=[get_user_list, create_user_list, get_user_file_path]
 )
