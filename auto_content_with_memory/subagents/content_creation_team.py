@@ -161,18 +161,18 @@ image_generator = Agent(
     tools=[generate_image],
 )
 
-media_team = LoopAgent(
-    name="media_team",
-    description="You manage a team that generates images for the post",
-    max_iterations=3,
-    sub_agents=[image_generator]
-)
+# media_team = LoopAgent(
+#     name="media_team",
+#     description="You manage a team that generates images for the post",
+#     max_iterations=3,
+#     sub_agents=[image_generator]
+# )
 
 
 content_creation_team = SequentialAgent(
     name="content_creation_team",
     description="You are the sequential coordinator of the content creation team.",
-    sub_agents=[theme_research_definition, content_research_agent, content_structure_agent, writing_agent, review_agent, edit_review, media_team]
+    sub_agents=[theme_research_definition, content_research_agent, content_structure_agent, writing_agent, review_agent, edit_review, image_generator]
 )
 
 # AI Agent for lead generation

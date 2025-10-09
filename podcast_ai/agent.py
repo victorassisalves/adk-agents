@@ -7,7 +7,7 @@ import os
 import google.auth
 load_dotenv()
 _, project_id = google.auth.default()
-# os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "True")
+os.environ.setdefault("GOOGLE_GENAI_USE_VERTEXAI", "True")
 os.environ.setdefault("GOOGLE_CLOUD_PROJECT", project_id)
 os.environ.setdefault("GOOGLE_CLOUD_REGION", "us-central1")
 
@@ -33,16 +33,16 @@ image_model = LiteLlm(
 )
 now = datetime.datetime.now()
 
-podcast_theme_researcher = LlmAgent(
-    name="Podcast_Theme_Researcher_Agent",
-    model=text_model,
-    description=(
-        "You are an expert in researching a theme for a deep dive and topics using online search tools."
-    ),
-    instruction=f"You are a helpful assistant that researches deep and relevant information about a theme using the most updated content as of today {now}. Use the google_search tool to gather information about the podcast theme provided by the user. Summarize your findings and provide a list of references.\n",
-    tools=[google_search],
-    output_key="research_details",
-)
+# podcast_theme_researcher = LlmAgent(
+#     name="Podcast_Theme_Researcher_Agent",
+#     model=text_model,
+#     description=(
+#         "You are an expert in researching a theme for a deep dive and topics using online search tools."
+#     ),
+#     instruction=f"You are a helpful assistant that researches deep and relevant information about a theme using the most updated content as of today {now}. Use the google_search tool to gather information about the podcast theme provided by the user. Summarize your findings and provide a list of references.\n",
+#     tools=[google_search],
+#     output_key="research_details",
+# )
 
 podcast_script_creator = Agent(
     name="Podcast_Script_Creator_Agent",
@@ -58,11 +58,12 @@ podcast_script_creator = Agent(
 
 root_agent = Agent(
     name="podcast_ai",
-    model=audio_model_native_audio,
+    model="gemini-live-2.5-flash-preview-native-audio",
     description=(
         "You are an expert in creating podcasts from theme research to script writing."
     ),
-    instruction="Talk with the user to extract the users idea for a podcast episode and create a written script with the episode script. Anser podcast scripts and specific information using google_search",
+    instruction="Talk with the user to extract the users idea for a podcast episode and create a written script with the episode script. Answer podcast scripts and specific information using google_search",
     tools=[google_search],
+    sub_agents=[podcast_script_creator],
     output_key="podcast_script",
 )
